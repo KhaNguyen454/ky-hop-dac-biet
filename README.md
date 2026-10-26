@@ -16,6 +16,27 @@ Cả lớp vào cùng một phòng bằng điện thoại. Người dẫn chiế
 
 Biểu quyết sai hoặc không bỏ phiếu là bị bãi nhiệm, **không có ngoại lệ**, kể cả người cuối cùng còn ghế. Khi không còn ai đương nhiệm, các dự thảo tiếp theo được bỏ qua ngay. Người bị bãi nhiệm chỉ có thể quay lại qua Phiên chất vấn.
 
+## Âm thanh
+
+Nhạc nền và hiệu ứng được tổng hợp trực tiếp bằng Web Audio trong `src/lib/music.ts`. Web không dùng file nhạc nào, nên không có vấn đề bản quyền và trang tải nhanh.
+
+- **Nhạc nền:** dùng âm giai ngũ cung Rê trưởng, vòng hòa âm D – Bm – G – A. Mỗi giai đoạn có một kiểu nhạc riêng:
+  - Phòng chờ: vui tươi, có giai điệu.
+  - Lúc biểu quyết: nhạc dồn dập hơn và càng căng khi gần hết giờ.
+  - Lúc công bố: nhạc nhẹ lại.
+  - Lúc bế mạc: rộn ràng.
+- **Hiệu ứng:**
+  - Tiếng "pop" khi có người vào phòng.
+  - Tích tắc trong 5 giây cuối.
+  - Tiếng đóng dấu khi công bố.
+  - Nhạc ngắn khi trả lời đúng hoặc sai.
+  - Tiếng khi được tái cử.
+  - Kèn chiến thắng lúc bế mạc.
+- **Màn hình người dẫn:** nhạc nền mặc định **bật**, để phát qua loa máy chiếu.
+- **Điện thoại:** nhạc nền mặc định **tắt**, để 40 máy không phát nhạc lệch nhau; chỉ có hiệu ứng.
+- **Bật/tắt:** nút ở góc dưới phải, trình duyệt nhớ lựa chọn.
+- Trình duyệt chỉ cho phát tiếng sau lần chạm hoặc bấm đầu tiên vào trang.
+
 ## Các trang
 
 - `/`: người chơi. Nhập mã phòng, họ tên, MSSV. Link dạng `/?room=1234` sẽ tự điền mã phòng.

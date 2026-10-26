@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api, loadSession, saveSession, usePoll, useRemaining, type Session } from "@/lib/client";
 import { LeaderTable, Orn, Stamp, TimerBar, type GameState } from "@/components/ui";
+import { SoundControls, useGameSounds } from "@/components/SoundControls";
+import { getSound } from "@/lib/music";
 
 export default function Page() {
   return (
@@ -26,8 +28,11 @@ function Player() {
   }, [code]);
 
   if (!checked) return <div className="wrap">Đang tải…</div>;
+  const dock = <SoundControls scope="player" defaultMusic={false} />;
   if (!session)
     return (
+      <>
+        {dock}
       <JoinForm
         initialCode={code}
         onJoined={(c, s) => {
@@ -37,8 +42,11 @@ function Player() {
           router.replace(`/?room=${c}`);
         }}
       />
+      </>
     );
   return (
+    <>
+      {dock}
     <Play
       code={code}
       session={session}
@@ -47,6 +55,7 @@ function Player() {
         setSession(null);
       }}
     />
+    </>
   );
 }
 
@@ -119,6 +128,10 @@ function Play({ code, session, onLeave }: { code: string; session: Session; onLe
   const [sent, setSent] = useState<Record<string, unknown>>({});
   const [err, setErr] = useState("");
   const remaining = useRemaining(data?.room.deadline, offset);
+  const stepId = data?.step?.id;
+  const answeredNow = !!stepId && (sent[stepId] ?? data?.me?.myAnswer) != null;
+  const eligibleNow = !!data?.me && !!data.step && (data.step.kind === "text" ? !data.me.alive : data.me.alive);
+  useGameSounds(data, remaining, { role: "player", answered: answeredNow, eligible: eligibleNow });
 
   useEffect(() => {
     if (data && !data.me) onLeave(); // người chơi không còn trong phòng (phòng mới) → vào lại
@@ -152,6 +165,7 @@ function Play({ code, session, onLeave }: { code: string; session: Session; onLe
     if (!step) return;
     setErr("");
     setSent((s) => ({ ...s, [step.id]: answer }));
+    getSound().sfx("click");
     try {
       await api(`/api/rooms/${code}/answer`, { method: "POST", body: JSON.stringify({ player: session.id, token: session.token, answer }) });
       refresh();

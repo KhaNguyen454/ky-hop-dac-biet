@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { api, usePoll, useRemaining } from "@/lib/client";
 import { LeaderTable, Orn, Podium, Stamp, TimerBar, type HostState } from "@/components/ui";
+import { SoundControls, useGameSounds } from "@/components/SoundControls";
 
 const PIN_KEY = "kyhop:host-pin";
 const ROOM_KEY = "kyhop:host-room";
@@ -34,9 +35,18 @@ export default function HostPage() {
     setReady(true);
   }, []);
   if (!ready) return null;
-  if (!pin) return <PinGate onOk={(p) => (write(PIN_KEY, p), setPin(p))} />;
-  if (!room) return <RoomPicker pin={pin} onRoom={(c) => (write(ROOM_KEY, c), setRoom(c))} onLogout={() => (write(PIN_KEY, ""), setPin(""))} />;
-  return <Console pin={pin} code={room} onClose={() => (write(ROOM_KEY, ""), setRoom(""))} />;
+  return (
+    <>
+      <SoundControls scope="host" defaultMusic />
+      {!pin ? (
+        <PinGate onOk={(p) => (write(PIN_KEY, p), setPin(p))} />
+      ) : !room ? (
+        <RoomPicker pin={pin} onRoom={(c) => (write(ROOM_KEY, c), setRoom(c))} onLogout={() => (write(PIN_KEY, ""), setPin(""))} />
+      ) : (
+        <Console pin={pin} code={room} onClose={() => (write(ROOM_KEY, ""), setRoom(""))} />
+      )}
+    </>
+  );
 }
 
 function PinGate({ onOk }: { onOk: (pin: string) => void }) {
@@ -46,13 +56,10 @@ function PinGate({ onOk }: { onOk: (pin: string) => void }) {
     e.preventDefault();
     setErr("");
     try {
-      // PIN đúng → API báo "không tìm thấy phòng 0000"; PIN sai → 401
-      await api(`/api/rooms/0000/host`, { pin: v });
+      await api(`/api/host-check`, { pin: v });
       onOk(v);
     } catch (e) {
-      const s = (e as { status?: number }).status;
-      if (s === 404) onOk(v);
-      else setErr((e as Error).message);
+      setErr((e as Error).message);
     }
   };
   return (
@@ -129,6 +136,7 @@ function Console({ pin, code, onClose }: { pin: string; code: string; onClose: (
   const [joinUrl, setJoinUrl] = useState("");
   const remaining = useRemaining(data?.room.deadline, offset);
   const autoFired = useRef<string>("");
+  useGameSounds(data, remaining, { role: "host", players: data?.counts.players });
 
   useEffect(() => {
     const url = `${window.location.origin}/?room=${code}`;
