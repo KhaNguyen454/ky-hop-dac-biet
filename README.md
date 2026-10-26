@@ -14,7 +14,7 @@ Cả lớp vào cùng một phòng bằng điện thoại. Người dẫn chiế
 
 **Thứ tự xếp hạng:** điểm cao hơn xếp trước. Nếu bằng điểm thì người còn đương nhiệm xếp trước, sau đó đến người có tổng thời gian trả lời ngắn hơn.
 
-Nếu **mọi đại biểu còn đương nhiệm** đều sai ở cùng một dự thảo thì chính những người đó được giữ ghế (không cộng điểm) để kỳ họp tiếp tục. Người đã bị bãi nhiệm từ các vòng trước vẫn bị bãi nhiệm, chỉ có thể quay lại qua Phiên chất vấn.
+Biểu quyết sai hoặc không bỏ phiếu là bị bãi nhiệm, **không có ngoại lệ**, kể cả người cuối cùng còn ghế. Khi không còn ai đương nhiệm, các dự thảo tiếp theo được bỏ qua ngay. Người bị bãi nhiệm chỉ có thể quay lại qua Phiên chất vấn.
 
 ## Các trang
 

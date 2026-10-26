@@ -63,13 +63,13 @@ describe("computeReveal – dự thảo", () => {
     expect(res.players.a.history[vote.id]).toBeUndefined();
   });
 
-  it("nếu mọi người còn đương nhiệm đều sai thì chỉ họ được giữ ghế, người bị bãi nhiệm từ trước vẫn bị loại", () => {
-    const res = computeReveal(vote, { a: player("a"), c: player("c"), b: player("b", { alive: false }) }, { a: { a: false, at: OPEN } }, OPEN, DEADLINE);
-    expect(res.notice).toBe("all_wrong_kept");
-    expect(res.players.a.alive).toBe(true);
-    expect(res.players.c.alive).toBe(true);
-    expect(res.players.b.alive).toBe(false); // lỗi cũ: b bị "hồi sinh" và trả lời tiếp được
-    expect(res.players.a.score).toBe(0);
+  it("người còn lại cuối cùng biểu quyết sai cũng bị bãi nhiệm, không ai được hồi sinh", () => {
+    // Tình huống chơi thử: dự thảo 1 B sai (đã bị bãi nhiệm), dự thảo 2 A – người cuối cùng – cũng sai
+    const res = computeReveal(vote, { a: player("a", { score: 145 }), b: player("b", { alive: false }) }, { a: { a: false, at: OPEN } }, OPEN, DEADLINE);
+    expect(res.players.a.alive).toBe(false);
+    expect(res.players.b.alive).toBe(false);
+    expect(res.players.a.score).toBe(145);
+    expect(res.notice).toBe("none_left");
   });
 
   it("chỉ cần còn 1 người đúng thì người sai bị bãi nhiệm như bình thường", () => {

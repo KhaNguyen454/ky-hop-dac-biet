@@ -157,7 +157,8 @@ function Console({ pin, code, onClose }: { pin: string; code: string; onClose: (
     if (!auto || !data || data.room.phase !== "question" || !data.step) return;
     const key = `${data.room.stepIndex}:${data.room.openedAt}`;
     if (autoFired.current === key) return;
-    const everyone = data.eligible > 0 && data.counts.answered >= data.eligible;
+    // Không còn ai đủ điều kiện (vd: tất cả đã bị bãi nhiệm) thì công bố ngay để bỏ qua vòng này
+    const everyone = data.eligible === 0 || data.counts.answered >= data.eligible;
     const overdue = Date.now() + offset > data.room.deadline + 1600;
     if (everyone || overdue) {
       autoFired.current = key;
@@ -260,7 +261,7 @@ function Console({ pin, code, onClose }: { pin: string; code: string; onClose: (
               <div className="row mt">
                 <div className="ring">{Math.ceil(remaining / 1000)}</div>
                 <div className="grow" style={{ fontSize: 22, fontWeight: 800 }}>
-                  Đã bỏ phiếu: {counts.answered}/{data.eligible}
+                  {data.eligible === 0 ? "Không còn đại biểu đủ điều kiện – bỏ qua vòng này" : `Đã bỏ phiếu: ${counts.answered}/${data.eligible}`}
                 </div>
                 <button className="btn" disabled={busy} onClick={() => act("reveal")}>
                   Công bố kết quả
@@ -312,7 +313,11 @@ function Console({ pin, code, onClose }: { pin: string; code: string; onClose: (
                 <b>Vì sao? </b>
                 {r.why}
               </div>
-              {room.notice === "all_wrong_kept" && <div className="error">Tất cả đại biểu còn đương nhiệm đều sai nên được giữ ghế để chơi tiếp. Người bị bãi nhiệm từ trước vẫn bị bãi nhiệm.</div>}
+              {room.notice === "none_left" && (
+                <div className="error">
+                  Tất cả đại biểu đều đã bị bãi nhiệm.{room.stepIndex < room.cvAt ? " Các dự thảo tiếp theo sẽ được bỏ qua tới Phiên chất vấn." : ""}
+                </div>
+              )}
               <button className="btn mt" style={{ fontSize: 22 }} disabled={busy} onClick={() => act("next")}>
                 {room.stepIndex + 1 >= room.totalSteps ? "Bế mạc & vinh danh" : "Tiếp theo"}
               </button>
