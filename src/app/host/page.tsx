@@ -312,7 +312,7 @@ function Console({ pin, code, onClose }: { pin: string; code: string; onClose: (
                 <b>Vì sao? </b>
                 {r.why}
               </div>
-              {room.notice === "all_revived" && <div className="error">Tất cả đều bị bãi nhiệm nên cả lớp được tái cử và chơi tiếp!</div>}
+              {room.notice === "all_wrong_kept" && <div className="error">Tất cả đại biểu còn đương nhiệm đều sai nên được giữ ghế để chơi tiếp. Người bị bãi nhiệm từ trước vẫn bị bãi nhiệm.</div>}
               <button className="btn mt" style={{ fontSize: 22 }} disabled={busy} onClick={() => act("next")}>
                 {room.stepIndex + 1 >= room.totalSteps ? "Bế mạc & vinh danh" : "Tiếp theo"}
               </button>

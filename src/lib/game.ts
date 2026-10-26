@@ -93,10 +93,11 @@ export function computeReveal(
         p.history[step.id] = { a: ans ? ans.a : null, ok: false, pts: 0 };
       }
     }
-    // Luật đặc biệt: nếu tất cả đều bị bãi nhiệm thì cả lớp được tái cử
+    // Luật đặc biệt: nếu MỌI đại biểu còn đương nhiệm ở vòng này đều sai thì chỉ những người đó được giữ ghế
+    // (người đã bị bãi nhiệm từ các vòng trước vẫn bị bãi nhiệm – trước đây hồi sinh cả lớp là sai luật)
     if (aliveBefore.length > 0 && aliveBefore.every((p) => !p.alive)) {
-      for (const p of Object.values(out)) p.alive = true;
-      return { players: out, notice: "all_revived" };
+      for (const p of aliveBefore) p.alive = true;
+      return { players: out, notice: "all_wrong_kept" };
     }
     return { players: out };
   }

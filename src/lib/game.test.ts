@@ -63,11 +63,19 @@ describe("computeReveal – dự thảo", () => {
     expect(res.players.a.history[vote.id]).toBeUndefined();
   });
 
-  it("nếu tất cả đều sai thì cả lớp được tái cử", () => {
-    const res = computeReveal(vote, { a: player("a"), b: player("b", { alive: false }) }, { a: { a: false, at: OPEN } }, OPEN, DEADLINE);
-    expect(res.notice).toBe("all_revived");
+  it("nếu mọi người còn đương nhiệm đều sai thì chỉ họ được giữ ghế, người bị bãi nhiệm từ trước vẫn bị loại", () => {
+    const res = computeReveal(vote, { a: player("a"), c: player("c"), b: player("b", { alive: false }) }, { a: { a: false, at: OPEN } }, OPEN, DEADLINE);
+    expect(res.notice).toBe("all_wrong_kept");
     expect(res.players.a.alive).toBe(true);
-    expect(res.players.b.alive).toBe(true);
+    expect(res.players.c.alive).toBe(true);
+    expect(res.players.b.alive).toBe(false); // lỗi cũ: b bị "hồi sinh" và trả lời tiếp được
+    expect(res.players.a.score).toBe(0);
+  });
+
+  it("chỉ cần còn 1 người đúng thì người sai bị bãi nhiệm như bình thường", () => {
+    const res = computeReveal(vote, { a: player("a"), b: player("b") }, { a: { a: true, at: OPEN }, b: { a: false, at: OPEN } }, OPEN, DEADLINE);
+    expect(res.notice).toBeUndefined();
+    expect(res.players.b.alive).toBe(false);
   });
 });
 

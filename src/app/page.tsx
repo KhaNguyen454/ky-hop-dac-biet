@@ -307,10 +307,16 @@ function RevealView({ data }: { data: GameState }) {
         <b>Vì sao? </b>
         {r.why}
       </div>
-      {room.notice === "all_revived" && <div className="error">Tất cả đều bị bãi nhiệm nên cả lớp được tái cử và chơi tiếp!</div>}
+      {room.notice === "all_wrong_kept" && <div className="error">Tất cả đại biểu còn đương nhiệm đều biểu quyết sai, nên những đại biểu này được giữ ghế để kỳ họp tiếp tục. Ai đã bị bãi nhiệm từ trước vẫn bị bãi nhiệm.</div>}
       {res && (
         <p className="center mt" style={{ fontSize: 20, fontWeight: 900 }}>
-          {res.ok ? <span style={{ color: "#24643a" }}>Chính xác! +{res.pts} điểm</span> : step.kind === "vote" ? <span className="red">Sai rồi – bạn bị bãi nhiệm</span> : <span className="red">Chưa chính xác</span>}
+          {res.ok ? (
+            <span style={{ color: "#24643a" }}>Chính xác! +{res.pts} điểm</span>
+          ) : step.kind === "vote" ? (
+            me.alive ? <span className="red">Sai rồi – nhưng bạn được giữ ghế (+0 điểm)</span> : <span className="red">Sai rồi – bạn bị bãi nhiệm</span>
+          ) : (
+            <span className="red">Chưa chính xác</span>
+          )}
         </p>
       )}
     </div>
