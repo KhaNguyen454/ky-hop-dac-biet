@@ -56,7 +56,8 @@ Trên máy cá nhân, nếu chưa có Redis thì dữ liệu nằm trong bộ nh
 ## Deploy lên Vercel
 
 1. **Import repo:** vào [vercel.com/new](https://vercel.com/new), chọn repo này rồi bấm **Deploy**. Vercel tự nhận ra đây là Next.js, không cần chỉnh gì.
-2. **Gắn Redis để lưu điểm:** vào Project → **Storage** → **Create Database**, chọn **Upstash → Upstash for Redis** (gói Free). Chọn **Connect** vào project. Vercel sẽ tự thêm `KV_REST_API_URL` và `KV_REST_API_TOKEN`.
+2. **Gắn Redis để lưu điểm:** vào Project → **Storage** → **Create Database**, chọn **Upstash → Upstash for Redis** (gói Free, vùng Singapore cho gần máy chủ). Chọn **Connect** vào project. Vercel sẽ tự thêm `KV_REST_API_URL` và `KV_REST_API_TOKEN`.
+   - File `vercel.json` đã đặt máy chủ ở Singapore (`sin1`) để người chơi ở Việt Nam bấm phiếu nhanh hơn.
 3. **Đặt PIN người dẫn:** vào Project → **Settings → Environment Variables**, thêm `HOST_PIN` (ví dụ `482615`) cho môi trường Production.
 4. **Deploy lại để nhận biến mới:** vào **Deployments**, chọn bản mới nhất → **Redeploy**.
 5. **Kiểm tra:** mở `https://<tên-project>.vercel.app/api/health`. Kết quả cần có `"storage":"redis"`, `"redisOk":true` và `"hostPinConfigured":true`.
