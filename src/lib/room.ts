@@ -45,7 +45,15 @@ async function loadAnswers(code: string, stepId: string): Promise<Record<string,
   return out;
 }
 
+// Trên Vercel, bộ nhớ tạm không dùng chung giữa các máy chủ: phòng tạo ở máy này,
+// người chơi gọi vào máy khác sẽ "không tìm thấy phòng" → chặn sớm với thông báo rõ ràng
+function assertSharedStore() {
+  if (getStore().kind === "memory" && process.env.VERCEL)
+    throw new AppError(503, "Web chưa kết nối Upstash Redis nên chưa thể tạo phòng. Vào Vercel → Storage để gắn Redis vào project, rồi Redeploy.");
+}
+
 export async function createRoom(): Promise<Room> {
+  assertSharedStore();
   const store = getStore();
   for (let i = 0; i < 20; i++) {
     const code = String(randomInt(1000, 10000));
@@ -59,6 +67,7 @@ const NAME_MAX = 40;
 const MSSV_RE = /^[A-Z]{2}\d{6}$/;
 
 export async function joinRoom(code: string, nameRaw: unknown, mssvRaw: unknown) {
+  assertSharedStore();
   const room = await loadRoom(code);
   if (room.phase === "ended") throw new AppError(409, "Kỳ họp đã kết thúc.");
   const name = String(nameRaw ?? "").replace(/[\u0000-\u001f<>]/g, "").replace(/\s+/g, " ").trim();

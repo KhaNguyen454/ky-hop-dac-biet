@@ -114,10 +114,27 @@ class MemoryStore implements Store {
 
 const g = globalThis as unknown as { __kyhopStore?: Store };
 
+// Tìm cặp biến URL/TOKEN của Upstash, kể cả khi Vercel thêm tiền tố tùy chỉnh (vd: STORAGE_KV_REST_API_URL)
+export function findUpstashEnv(env: Record<string, string | undefined> = process.env): { url: string; token: string; urlVar: string } | null {
+  const pairs: [string, string][] = [
+    ["KV_REST_API_URL", "KV_REST_API_TOKEN"],
+    ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"],
+  ];
+  for (const [u, t] of pairs) if (env[u] && env[t]) return { url: env[u]!, token: env[t]!, urlVar: u };
+  for (const key of Object.keys(env).sort()) {
+    for (const [u, t] of pairs) {
+      if (key.endsWith(u)) {
+        const tokenKey = key.slice(0, key.length - u.length) + t;
+        if (env[key] && env[tokenKey]) return { url: env[key]!, token: env[tokenKey]!, urlVar: key };
+      }
+    }
+  }
+  return null;
+}
+
 export function getStore(): Store {
   if (g.__kyhopStore) return g.__kyhopStore;
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-  g.__kyhopStore = url && token ? new RedisStore(new Redis({ url, token, automaticDeserialization: false })) : new MemoryStore();
+  const cfg = findUpstashEnv();
+  g.__kyhopStore = cfg ? new RedisStore(new Redis({ url: cfg.url, token: cfg.token, automaticDeserialization: false })) : new MemoryStore();
   return g.__kyhopStore;
 }

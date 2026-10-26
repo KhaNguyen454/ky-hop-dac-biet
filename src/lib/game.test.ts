@@ -111,3 +111,13 @@ describe("rank & maskMssv", () => {
     expect(maskMssv("SE183062")).toBe("SE18**62");
   });
 });
+
+import { findUpstashEnv } from "./store";
+describe("findUpstashEnv", () => {
+  it("nhận cả tên chuẩn lẫn tên có tiền tố do Vercel thêm", () => {
+    expect(findUpstashEnv({ KV_REST_API_URL: "u", KV_REST_API_TOKEN: "t" })?.urlVar).toBe("KV_REST_API_URL");
+    expect(findUpstashEnv({ STORAGE_KV_REST_API_URL: "u", STORAGE_KV_REST_API_TOKEN: "t" })?.url).toBe("u");
+    expect(findUpstashEnv({ UPSTASH_REDIS_REST_URL: "u", UPSTASH_REDIS_REST_TOKEN: "t" })?.token).toBe("t");
+    expect(findUpstashEnv({ KV_REST_API_URL: "u" })).toBeNull();
+  });
+});
